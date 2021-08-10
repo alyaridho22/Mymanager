@@ -1,0 +1,2 @@
+rootProject.name = "trialMyManager"
+include ':app'
