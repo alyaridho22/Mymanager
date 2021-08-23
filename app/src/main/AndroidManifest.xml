@@ -9,7 +9,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TrialMyManager">
-        <activity android:name=".Ongoing.DetailSchedule"></activity>
+        <activity android:name=".Report.ReportPage"></activity>
+        <activity android:name=".Create.ThisCreate" />
+        <activity android:name=".Profile.UserProfile" />
+        <activity android:name=".Ongoing.DetailSchedule" />
         <activity android:name=".Create.EditSchedule" />
         <activity android:name=".Create.Create" />
         <activity android:name=".Report.Report" />

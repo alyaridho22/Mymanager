@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/ogtanggal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tanggal"
+            android:textSize="14sp"/>
+        <TextView
+            android:id="@+id/ogjam"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Jam"
+            android:textSize="14sp"/>
+        <TextView
+            android:id="@+id/ognama"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nama Acara"
+            android:textSize="14sp"/>
+    </LinearLayout>
+    <Button
+        android:id="@+id/done"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DONE" />
+    </LinearLayout>
+
+</RelativeLayout>
