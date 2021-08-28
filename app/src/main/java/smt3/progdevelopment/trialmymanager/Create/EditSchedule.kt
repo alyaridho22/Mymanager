@@ -16,7 +16,7 @@ class EditSchedule : AppCompatActivity() {
     private lateinit var mDatabase: DatabaseReference
     private lateinit var myPreferences: mySharedPreference
     private lateinit var userId: String
-    private lateinit var koleksiId:String
+    private lateinit var ScheduleId :String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,69 +25,13 @@ class EditSchedule : AppCompatActivity() {
         mLoading.setCancelable(false)
         mLoading.setMessage("Loading ...")
 
-        mDatabase = FirebaseDatabase.getInstance().getReference("Koleksi")
+        mDatabase = FirebaseDatabase.getInstance().getReference("Schedule")
         myPreferences = mySharedPreference(this@EditSchedule)
         userId = myPreferences.getValue("id")!!
 
         if (intent != null){
-            koleksiId = intent.getStringExtra("koleksiId")
+            ScheduleId = intent.getStringExtra("Schedule")
         }
 
-        setValue()
 
-        btnUpdate.setOnClickListener {
-            if (validate()){
-                val mNama = etNama.text.toString()
-                val mJumlah = etJumlah.text.toString().toInt()
-                create(mNama, mJumlah)
-            }
-        }
-
-    }
-
-
-    private fun setValue() {
-        mLoading.show()
-        mDatabase.child(userId).child(koleksiId)
-            .addValueEventListener(object : ValueEventListener {
-                override fun onCancelled(error: DatabaseError) {
-                    mLoading.dismiss()
-                    Toast.makeText(
-                        this@EditSchedule,
-                        "${error.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    mLoading.dismiss()
-                    val koleksi = snapshot.getValue(Schedule::class.java)
-                    etNama.setText(koleki!!.nama)
-                    etJumlah.setText(koleksi.jumlah.toString())
-                }
-            })
-    }
-    private fun validate(): Boolean {
-        // Cek apakah form sudah terisi atau belum
-        if (etNama.text.isEmpty()){
-            etNama.requestFocus()
-            etNama.error = "Masukkan nama koleksi"
-            return false
-        }
-        if (etJumlah.text.isEmpty()){
-            etJumlah.requestFocus()
-            etJumlah.error = "Masukkan jumlah koleksi"
-            return false
-        }
-        return true
-    }
-    private fun create(mNama: String, mJumlah: Int) {
-        mLoading.show()
-        val koleksi = Schedule(koleksiId, mNama, mJumlah)
-        mDatabase.child(userId).child(koleksiId).setValue(koleksi)
-        val goMain = Intent(this@EditSchedule, MainActivity::class.java)
-        startActivity(goMain)
-        finish()
-        mLoading.dismiss()
-    }
 }

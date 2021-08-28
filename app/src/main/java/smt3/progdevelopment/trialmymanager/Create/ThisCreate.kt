@@ -30,56 +30,7 @@ override fun onCreate(savedInstanceState: Bundle?) {
     mDatabase = FirebaseDatabase.getInstance().getReference("Schedule")
     myPreferences = Preferences(this@ThisCreate)
 
-    // mengambil data yang di kirim melalui intent
-    if (intent != null){
-        userId = intent.getStringExtra("userId")!!
-    }
 
-    btnTambah.setOnClickListener {
-        if (validate()){
-            val mNama = etNama.text.toString()
-            val mJumlah = etJumlah.text.toString().toInt()
-
-            create(mNama, mJumlah)
-        }
-    }
-
-}
-
-private fun validate(): Boolean {
-    // Cek apakah form sudah terisi atau belum
-    if (etNama.text.isEmpty()){
-        etNama.requestFocus()
-        etNama.error = "Masukkan nama koleksi"
-        return false
-    }
-    if (etJumlah.text.isEmpty()){
-        etJumlah.requestFocus()
-        etJumlah.error = "Masukkan jumlah koleksi"
-        return false
-    }
-    return true
-}
-private fun create(mNama: String, mJumlah: Int) {
-    mLoading.show()
-
-    // Get Date Time Now
-    val  mCurrentTime = SimpleDateFormat("yyyyMMdd:HHmmss", Locale.getDefault())
-        .format(Date())
-
-    // Mengisi variabel pada model Koleksi
-    val  koleksi = Koleksi(mCurrentTime, mNama, mJumlah)
-    mDatabase.child(userId).child(mCurrentTime).setValue(koleksi)
-
-    // Intent ke Main Activity
-    val goMain = Intent(
-        this@CreateActivity, MainActivity::class.java
-    )
-    startActivity(goMain)
-    finish()
-
-    // Menghilangkan Loading
-    mLoading.dismiss()
 
 }
 }
