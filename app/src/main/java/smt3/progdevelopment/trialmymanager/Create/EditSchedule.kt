@@ -8,12 +8,13 @@ import android.widget.Toast
 import com.google.firebase.database.*
 import smt3.progdevelopment.trialmymanager.MainActivity
 import smt3.progdevelopment.trialmymanager.Model.Schedule
+import smt3.progdevelopment.trialmymanager.Preference.mySharedPreference
 import smt3.progdevelopment.trialmymanager.R
 
 class EditSchedule : AppCompatActivity() {
     private lateinit var mLoading: ProgressDialog
     private lateinit var mDatabase: DatabaseReference
-    private lateinit var myPreferences: Preference
+    private lateinit var myPreferences: mySharedPreference
     private lateinit var userId: String
     private lateinit var koleksiId:String
 
@@ -25,7 +26,7 @@ class EditSchedule : AppCompatActivity() {
         mLoading.setMessage("Loading ...")
 
         mDatabase = FirebaseDatabase.getInstance().getReference("Koleksi")
-        myPreferences = Preference(this@EditSchedule)
+        myPreferences = mySharedPreference(this@EditSchedule)
         userId = myPreferences.getValue("id")!!
 
         if (intent != null){

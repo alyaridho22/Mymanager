@@ -34,6 +34,18 @@
             android:layout_height="wrap_content"
             android:text="Nama Acara"
             android:textSize="14sp"/>
+        <TextView
+            android:id="@+id/ogexpense"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pengeluaran"
+            android:textSize="14sp"/>
+        <TextView
+            android:id="@+id/ogdetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Detail"
+            android:textSize="14sp"/>
     </LinearLayout>
     <Button
         android:id="@+id/done"

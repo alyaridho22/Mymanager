@@ -12,17 +12,12 @@
         <activity android:name=".Report.ReportPage"></activity>
         <activity android:name=".Create.ThisCreate" />
         <activity android:name=".Profile.UserProfile" />
-        <activity android:name=".Ongoing.DetailSchedule" />
-        <activity android:name=".Create.EditSchedule" />
-        <activity android:name=".Create.Create" />
-        <activity android:name=".Report.Report" />
-        <activity android:name=".Ongoing.EditSchedule" />
         <activity android:name=".Ongoing.OngoingPage" />
+        <activity android:name=".Create.EditSchedule" />
         <activity android:name=".Create.CreateSchedule" />
-        <activity android:name=".Create.Create_Activity" />
         <activity android:name=".Authentication.SignUp" />
-        <activity android:name=".Authentication.SignIn" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity" />
+        <activity android:name=".Authentication.SignIn">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
