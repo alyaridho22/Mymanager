@@ -1,14 +1,10 @@
 package smt3.progdevelopment.trialmymanager.Create
 
 import android.app.ProgressDialog
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import com.google.firebase.database.*
-import smt3.progdevelopment.trialmymanager.MainActivity
-import smt3.progdevelopment.trialmymanager.Model.Schedule
-import smt3.progdevelopment.trialmymanager.Preference.mySharedPreference
+import smt3.progdevelopment.trialmymanager.Utils.mySharedPreference
 import smt3.progdevelopment.trialmymanager.R
 
 class EditSchedule : AppCompatActivity() {
@@ -16,7 +12,7 @@ class EditSchedule : AppCompatActivity() {
     private lateinit var mDatabase: DatabaseReference
     private lateinit var myPreferences: mySharedPreference
     private lateinit var userId: String
-    private lateinit var ScheduleId :String
+    private lateinit var ScheduleId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,9 +25,10 @@ class EditSchedule : AppCompatActivity() {
         myPreferences = mySharedPreference(this@EditSchedule)
         userId = myPreferences.getValue("id")!!
 
-        if (intent != null){
-            ScheduleId = intent.getStringExtra("Schedule")
-        }
+//        if (intent != null) {
+//            ScheduleId = intent.getStringExtra("Schedule")
+//        }
 
 
+    }
 }

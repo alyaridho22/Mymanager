@@ -1,4 +1,4 @@
-package smt3.progdevelopment.trialmymanager.Preference
+package smt3.progdevelopment.trialmymanager.Utils
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -11,12 +11,22 @@ class mySharedPreference(mContext: Context) {
 
     private val mSharedPreferences = mContext.getSharedPreferences(USER_PREF, 0)
 
-    fun getValue(key: String, value: String) {
+    fun setValue(key: String, value: String){
         val editor: SharedPreferences.Editor = mSharedPreferences.edit()
         editor.putString(key, value)
         editor.apply()
     }
-    fun setValue(key: String): String?{
+
+    fun getValue(key: String): String?{
         return mSharedPreferences.getString(key, "")
     }
+
+//    fun getValue(key: String, value: String) {
+//        val editor: SharedPreferences.Editor = mSharedPreferences.edit()
+//        editor.putString(key, value)
+//        editor.apply()
+//    }
+//    fun setValue(key: String): String?{
+//        return mSharedPreferences.getString(key, "")
+//    }
 }
