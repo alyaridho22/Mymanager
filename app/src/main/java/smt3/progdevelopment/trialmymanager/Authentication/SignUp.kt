@@ -4,139 +4,144 @@ import android.app.ProgressDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.Toast
 import com.google.firebase.database.*
 import smt3.progdevelopment.trialmymanager.MainActivity
 import smt3.progdevelopment.trialmymanager.Model.User
-import smt3.progdevelopment.trialmymanager.R
+import smt3.progdevelopment.trialmymanager.Utils.Constants
+import smt3.progdevelopment.trialmymanager.Utils.mySharedPreference
+import smt3.progdevelopment.trialmymanager.databinding.ActivitySignUpBinding
 import java.text.SimpleDateFormat
 import java.util.*
 
-private lateinit var mLoading: ProgressDialog
-private lateinit var mDatabase: DatabaseReference
-private lateinit var myPreferences: Preference
 
 class SignUp : AppCompatActivity() {
+
+    private lateinit var mLoading: ProgressDialog
+    private lateinit var mDatabase: DatabaseReference
+    private lateinit var myPreferences: mySharedPreference
+    private lateinit var mSignUpBinding: ActivitySignUpBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sign_up)
+        mSignUpBinding = ActivitySignUpBinding.inflate(layoutInflater)
+        setContentView(mSignUpBinding.root)
 
-        val daftarNama = findViewById<EditText>(R.id.signup_name)
-        val daftarEmail = findViewById<EditText>(R.id.signup_email)
-        val daftarNomor = findViewById<EditText>(R.id.signup_pn)
-        val daftarPw = findViewById<EditText>(R.id.signup_pw)
-        val daftar = findViewById<ImageButton>(R.id.signupbt)
-        val keLogin = findViewById<ImageButton>(R.id.tologinbt)
+//        val daftarNama = findViewById<EditText>(R.id.signup_name)
+//        val daftarEmail = findViewById<EditText>(R.id.signup_email)
+//        val daftarNomor = findViewById<EditText>(R.id.signup_pn)
+//        val daftarPw = findViewById<EditText>(R.id.signup_pw)
+//        val daftar = findViewById<ImageButton>(R.id.signupbt)
+//        val keLogin = findViewById<ImageButton>(R.id.tologinbt)
 
-        mLoading = ProgressDialog( this@SignUp)
+        mLoading = ProgressDialog(this@SignUp)
         mLoading.setCancelable(false)
         mLoading.setMessage("Loading...")
 
-        mDatabase = FirebaseDatabase.getInstance().getReference( "User")
-        myPreferences = Preference(this@SignUp)
+        mDatabase = FirebaseDatabase.getInstance().getReference("User")
+        myPreferences = mySharedPreference(this@SignUp)
 
-        keLogin.setOnClickListener {
+        mSignUpBinding.btnCreate.setOnClickListener {
 
-            val goSignIn = Intent( this@SignUp, SignIn::class.java)
-            startActivity(goSignIn)
-            finish()
-        }
-        daftar.setOnClickListener {
-
+//            startActivity(Intent(this@SignUp, SignIn::class.java))
+//            finish()
             if (validate()) {
-                val masukNama = daftarNama.text.toString()
-                val masukEmail = daftarEmail.text.toString()
-                val masukNomor = daftarNomor.text.toString()
-                val masukPassword = daftarPw.text.toString()
+                val mName = mSignUpBinding.etName.text.toString()
+                val mEmail = mSignUpBinding.etEmail.text.toString()
+                val mPhone = mSignUpBinding.etPhone.text.toString()
+                val mPassword = mSignUpBinding.etPassword.text.toString()
 
-                signUp(masukNama, masukEmail, masukNomor, masukPassword)
-
+                signUp(mName, mEmail, mPhone, mPassword)
             }
         }
     }
 
-    val daftarNama = findViewById<EditText>(R.id.signup_name)
-    val daftarEmail = findViewById<EditText>(R.id.signup_email)
-    val daftarNomor = findViewById<EditText>(R.id.signup_pn)
-    val daftarPw = findViewById<EditText>(R.id.signup_pw)
-    val daftar = findViewById<ImageButton>(R.id.signupbt)
-    val keLogin = findViewById<ImageButton>(R.id.tologinbt)
     private fun validate(): Boolean {
         //cek apa form sudah terisi atau belum
-        if (daftarNama.text.isEmpty()){
-            daftarNama.requestFocus()
-            daftarNama.error = "Enter your First Name"
+        if (mSignUpBinding.etName.text.isEmpty()) {
+            mSignUpBinding.etName.requestFocus()
+            mSignUpBinding.etName.error = "Enter your name"
             return false
         }
-        if (daftarEmail.text.isEmpty()){
-            daftarEmail.requestFocus()
-            daftarEmail.error = "Enter your Last Name"
+        if (mSignUpBinding.etEmail.text.isEmpty()) {
+            mSignUpBinding.etEmail.requestFocus()
+            mSignUpBinding.etEmail.error = "Enter your email"
             return false
         }
-        if (daftarNomor.text.isEmpty()){
-            daftarNomor.requestFocus()
-            daftarNomor.error = "Enter your Email"
+        if (mSignUpBinding.etPhone.text.isEmpty()) {
+            mSignUpBinding.etPhone.requestFocus()
+            mSignUpBinding.etPhone.error = "Enter your phone number"
             return false
         }
-        if (daftarPw.text.isEmpty()){
-            daftarPw.requestFocus()
-            daftarPw.error = "Enter your Password"
+        if (mSignUpBinding.etPassword.text.isEmpty()) {
+            mSignUpBinding.etPassword.requestFocus()
+            mSignUpBinding.etPassword.error = "Enter your Password"
             return false
         }
-        return false
+        return true
     }
+
     private fun signUp(
-        masukNama: String, masukEmail: String, masukNomor: String, masukPassword: String
-    ){
+        mName: String, mEmail: String, mPhone: String, mPassword: String
+    ) {
         mLoading.show()
 
-        val cekEmail = mDatabase.orderByChild("email").equalTo(masukEmail)
+        val emailCheck = mDatabase.orderByChild("email").equalTo(mEmail)
 
-        cekEmail.addListenerForSingleValueEvent(object: ValueEventListener {
-            override fun onCancelled(error: DatabaseError){
+        emailCheck.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError) {
                 mLoading.dismiss()
                 Toast.makeText(
                     this@SignUp,
                     "{$error.message}",
-                Toast.LENGTH_SHORT
+                    Toast.LENGTH_SHORT
                 ).show()
             }
 
-            override fun onDataChange(snapshot: DataSnapshot){
-                if (snapshot.value == null){
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.value == null) {
                     //get date time now
                     val mCurrentTime =
-                        SimpleDateFormat( "yyyyMMdd:HHmmss", Locale.getDefault())
-                    .format(Date())
+                        SimpleDateFormat("yyyyMMdd:HHmmss", Locale.getDefault())
+                            .format(Date())
 
                     val user = User(
-                        mCurrentTime, masukNama, masukEmail, masukNomor, masukPassword
+                        mCurrentTime, mName, mEmail, mPhone, mPassword
                     )
                     mDatabase.child(mCurrentTime).setValue(user)
 
-                    myPreferences.setValue("user", "signIn")
+                    Toast.makeText(
+                        this@SignUp,
+                        "Your account has been successfully registered",
+                        Toast.LENGTH_SHORT
+                    ).show()
 
-                    //menyimpan data user yang sudha masuk ke shared preferences
-                    myPreferences.setValue("id", user.id)
-                    myPreferences.setValue("username", user.username)
-                    myPreferences.setValue("email", user.email)
-                    myPreferences.setValue("phone", user.phone)
-                    myPreferences.setValue("password", user.password)
-
-                    //intent ke MainActivity
-                    val goMain = Intent(this@SignUp, MainActivity::class.java)
-                    startActivity(goMain)
+                    startActivity(Intent(this@SignUp, SignIn::class.java))
                     finish()
 
                     mLoading.dismiss()
-                }else {
+
+//                    myPreferences.setValue(Constants.USER, Constants.LOGIN)
+//
+//                    //menyimpan data user yang sudha masuk ke shared preferences
+//                    myPreferences.setValue(Constants.USER_ID, user.id)
+//                    myPreferences.setValue(Constants.USER_NAME, user.username)
+//                    myPreferences.setValue(Constants.USER_EMAIL, user.email)
+//                    myPreferences.setValue(Constants.USER_PHONE, user.phone)
+//                    myPreferences.setValue(Constants.USER_PASSWORD, user.password)
+//
+//                    //intent ke MainActivity
+//                    val goMain = Intent(this@SignUp, MainActivity::class.java)
+//                    startActivity(goMain)
+//                    finish()
+//
+//                    mLoading.dismiss()
+                } else {
                     mLoading.dismiss()
                     Toast.makeText(
                         this@SignUp,
-                    "Email sudah digunakan",
-                    Toast.LENGTH_SHORT
+                        "Email sudah digunakan",
+                        Toast.LENGTH_SHORT
                     ).show()
 
                 }

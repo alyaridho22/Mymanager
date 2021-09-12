@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "519465093161",
+    "firebase_url": "https://trialmymanager-default-rtdb.firebaseio.com",
     "project_id": "trialmymanager",
     "storage_bucket": "trialmymanager.appspot.com"
   },

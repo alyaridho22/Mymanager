@@ -11,23 +11,23 @@ import android.widget.Toast
 import com.google.firebase.database.*
 import smt3.progdevelopment.trialmymanager.MainActivity
 import smt3.progdevelopment.trialmymanager.Model.User
-import smt3.progdevelopment.trialmymanager.Preference.mySharedPreference
+import smt3.progdevelopment.trialmymanager.Utils.mySharedPreference
 import smt3.progdevelopment.trialmymanager.R
+import smt3.progdevelopment.trialmymanager.Utils.Constants
+import smt3.progdevelopment.trialmymanager.databinding.ActivitySignInBinding
 
 class SignIn : AppCompatActivity() {
 
     private lateinit var mLoading: ProgressDialog
     private lateinit var mDatabase: DatabaseReference
     private lateinit var myPreferences: mySharedPreference
+    private lateinit var mSignInBinding: ActivitySignInBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sign_in)
+        mSignInBinding = ActivitySignInBinding.inflate(layoutInflater)
+        setContentView(mSignInBinding.root)
 
-        val masukEmail = findViewById<EditText>(R.id.insertEmail)
-        val masukPw = findViewById<EditText>(R.id.insertPassword)
-        val masuk = findViewById<ImageButton>(R.id.loginbutton)
-        val keSignup = findViewById<TextView>(R.id.toSignUp)
 
         mLoading = ProgressDialog(this@SignIn)
         mLoading.setCancelable(false)
@@ -38,7 +38,7 @@ class SignIn : AppCompatActivity() {
 
 
 
-        if (myPreferences.getValue("user").equals("signIn")){
+        if (myPreferences.getValue("user").equals("signIn")) {
             val goMain = Intent(
                 this@SignIn, MainActivity::class.java
             )
@@ -47,92 +47,88 @@ class SignIn : AppCompatActivity() {
             return
         }
 
-        keSignup.setOnClickListener{
-            val goSignIn= Intent(
-                this@SignIn, SignUp::class.java
-            )
-            startActivity(goSignIn)
+        mSignInBinding.tvSignUp.setOnClickListener {
+            startActivity(Intent(this, SignUp::class.java))
             finish()
         }
-        masuk.setOnClickListener{
+
+
+
+        mSignInBinding.btnSignIn.setOnClickListener {
             if (validate()) {
-            val mEmail = masukEmail.text.toString()
-            val mPassword = masukPw.text.toString()
+                val mEmail = mSignInBinding.etEmail.text.toString()
+                val mPassword = mSignInBinding.etPassword.text.toString()
 
-            signUp(mEmail, mPassword)
-
-        }
-    }
-}
-    val masukEmail = findViewById<EditText>(R.id.insertEmail)
-    val masukPw = findViewById<EditText>(R.id.insertPassword)
-
-private fun  validate(): Boolean{
-
-    if (masukEmail.text.isEmpty()){
-    }
-    if (masukPw.text.isEmpty()) {
-        masukPw.requestFocus()
-        masukPw.error = "Enter your password"
-        return false
-    }
-    return false
-}
-
-private fun signUp(mEmail: String, mPassword: String){
-    mLoading.show()
-
-    val cekEmail = mDatabase.orderByChild( "email").equalTo(mEmail)
-
-    cekEmail.addListenerForSingleValueEvent(object : ValueEventListener){
-        override fun onCancelled(error: DatabaseError) {
-            mLoading.dismiss()
-            Toast.makeText(
-                this@SignIn,
-             "${error.message}",
-            Toast.LENGTH_SHORT
-            ).show()
+                signUp(mEmail, mPassword)
+            }
         }
 
-        override fun onDataChange(snapshot: DataSnapshot) {
-            if (snapshot.value != null){
-                val user: User? = null
+    }
 
-                for (item in snapshot.children){
-                    user = item.getValue(User::class.java)
+    private fun validate(): Boolean {
+
+        if (mSignInBinding.etEmail.text.isEmpty()) {
+            mSignInBinding.etEmail.requestFocus()
+            mSignInBinding.etPassword.error = "Enter your email"
+
+            return false
+        }
+        if (mSignInBinding.etPassword.text.isEmpty()) {
+            mSignInBinding.etPassword.requestFocus()
+            mSignInBinding.etPassword.error = "Enter your password"
+            return false
+        }
+        return true
+    }
+
+    private fun signUp(mEmail: String, mPassword: String) {
+//        mLoading.show()
+
+        val emailCheck = mDatabase.orderByChild("email").equalTo(mEmail)
+
+        emailCheck.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(snapshot.value != null){
+                    var user: User? = null
+
+                    for (item in snapshot.children){
+                        user = item.getValue(User::class.java)
+                    }
+
+                    if (user!!.password == mPassword){
+
+                        myPreferences.setValue(Constants.USER, Constants.LOGIN)
+
+                        myPreferences.setValue(Constants.USER_ID, user.id)
+                        myPreferences.setValue(Constants.USER_NAME, user.username)
+                        myPreferences.setValue(Constants.USER_EMAIL, user.email)
+                        myPreferences.setValue(Constants.USER_PHONE, user.phone)
+                        myPreferences.setValue(Constants.USER_PASSWORD, user.password)
+
+                        startActivity(Intent(this@SignIn, MainActivity::class.java))
+                        finish()
+
+                        mLoading.dismiss()
+                    }
+                    else{
+                        Toast.makeText(this@SignIn, "Email or password are wrong", Toast.LENGTH_SHORT).show()
+                    }
                 }
-                if (user!!.password == mPassword){
-                    myPreferences.setValue("user", "signin")
-
-                    myPreferences.setValue("id", user.id)
-                    myPreferences.setValue("username", user.username)
-                    myPreferences.setValue("phone", user.phone)
-                    myPreferences.setValue("email", user.email)
-                    myPreferences.setValue("password", user.password)
-
-                    val goMain = Intent( this@SignIn, MainActivity::class.java
-                    )
-                    startActivity(goMain)
-                    finish()
-
-
-                    mLoading.dismiss()
-                }else{
-                    mLoading.dismiss()
-                    Toast.makeText(
-                        this@SignIn,
-                    "Password salah",
-                    Toast.LENGTH_SHORT
-                    ).show()
+                else{
+                    Toast.makeText(this@SignIn, "Email not registered", Toast.LENGTH_SHORT).show()
                 }
-            }else{
+            }
+
+            override fun onCancelled(error: DatabaseError) {
                 mLoading.dismiss()
                 Toast.makeText(
-                     this@SignIn,
-                "email belum terdaftar",
-                Toast.LENGTH_SHORT
+                    this@SignIn,
+                    error.message,
+                    Toast.LENGTH_SHORT
                 ).show()
             }
         })
     }
-}}
+}
+
+
