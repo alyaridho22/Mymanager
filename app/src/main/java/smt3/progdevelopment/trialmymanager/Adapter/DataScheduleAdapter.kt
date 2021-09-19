@@ -7,77 +7,104 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.textview.MaterialTextView
 import com.google.firebase.database.*
-import smt3.progdevelopment.trialmymanager.Create.EditSchedule
+import smt3.progdevelopment.trialmymanager.Create.UpdateScheduleActivity
 import smt3.progdevelopment.trialmymanager.Model.Schedule
-import smt3.progdevelopment.trialmymanager.Utils.mySharedPreference
 import smt3.progdevelopment.trialmymanager.R
 import smt3.progdevelopment.trialmymanager.Utils.Constants
-import smt3.progdevelopment.trialmymanager.databinding.ScheduleBinding
-import kotlin.collections.ArrayList
-
-class DataScheduleAdapter : RecyclerView.Adapter<DataScheduleAdapter.listScheduleHolderView>() {
-
-    private var listSchedule = ArrayList<Schedule>()
-    private lateinit var myPreference: mySharedPreference
-    private lateinit var mDatabaseReference: DatabaseReference
-    private lateinit var userId:String
+import smt3.progdevelopment.trialmymanager.Utils.mySharedPreference
 
 
-    fun setSchedule(listSchedule: ArrayList<Schedule>?) {
-        if (listSchedule == null) return
-        this.listSchedule.clear()
-        this.listSchedule.addAll(listSchedule)
+class DataScheduleAdapter(var mContext: Context, var mData: ArrayList<Schedule>): RecyclerView.Adapter<DataScheduleAdapter.ViewHolder>(){
 
-        notifyDataSetChanged()
-    }
+    private lateinit var mLoading: ProgressDialog
+    private lateinit var mDatabase: DatabaseReference
+    private lateinit var myPreferences: mySharedPreference
+    private lateinit var userId: String
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): DataScheduleAdapter.listScheduleHolderView {
-
-        val itemScheduleBinding =
-            ScheduleBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference("Schedule")
-        myPreference = mySharedPreference(parent.context)
-        userId = myPreference.getValue(Constants.USER_ID)!!
-
-        return listScheduleHolderView(itemScheduleBinding)
+    inner class ViewHolder(v: View): RecyclerView.ViewHolder(v) {
+        var mDate = v.findViewById<MaterialTextView>(R.id.tv_date)
+        var mTime = v.findViewById<MaterialTextView>(R.id.tv_time)
+        var mEventName = v.findViewById<MaterialTextView>(R.id.tv_event_name)
+        var btnUpdate = v.findViewById<MaterialButton>(R.id.btn_edit)
+        var btnDelete = v.findViewById<MaterialButton>(R.id.btn_delete)
 
     }
 
-    override fun onBindViewHolder(
-        holder: DataScheduleAdapter.listScheduleHolderView,
-        position: Int
-    ) {
-        val schedule = listSchedule[position]
-        holder.bind(schedule)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(mContext)
+            .inflate(R.layout.schedule, parent, false)
+
+        //Initialize variable
+        mLoading = ProgressDialog(mContext)
+        mLoading.setCancelable(false)
+        mLoading.setMessage("Loading ...")
+        mDatabase = FirebaseDatabase.getInstance().getReference("Schedule")
+        myPreferences = mySharedPreference(mContext)
+        userId = myPreferences.getValue(Constants.USER_ID)!!
+
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.mDate.text = mData[position].date
+        holder.mTime.text = mData[position].time
+        holder.mEventName.text = mData[position].activity
+
+        holder.btnUpdate.setOnClickListener {
+            (mContext as Activity).startActivity(Intent(mContext, UpdateScheduleActivity::class.java).apply {
+                putExtra("id", mData[position].id)
+            })
+
+//            (mContext as Activity).finish()
+        }
+
+        holder.btnDelete.setOnClickListener {
+            mLoading.show()
+            val delete = mDatabase.child(userId)
+                .orderByChild("id")
+                .equalTo(mData[position].id)
+
+            delete.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onCancelled(error: DatabaseError) {
+                    mLoading.dismiss()
+                    Toast.makeText(
+                        mContext,
+                        error.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    mLoading.dismiss()
+                    for (item in snapshot.children) {
+                        item.ref.removeValue()
+                    }
+                    //Refresh data
+                    mData.removeAt(position)
+                    notifyItemRemoved(position)
+                    Toast.makeText(
+                        mContext,
+                        "A schedule has been successfully removed",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+            })
+        }
     }
 
     override fun getItemCount(): Int {
-        return listSchedule.size
-    }
-
-    class listScheduleHolderView(private val binding: ScheduleBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(scheduleItem: Schedule) {
-            with(binding){
-                tvDate.text = scheduleItem.date
-                tvEventName.text = scheduleItem.activity
-                tvTime.text = scheduleItem.time
-            }
-        }
-
+        return mData.size
     }
 
 }
+
+
 //class DataSchedule(var mContext: Context, var mData: ArrayList<Schedule>) :
 //    RecyclerView.Adapter<DataSchedule.ViewHolder>() {
 //

@@ -24,9 +24,8 @@ class ThisCreate : AppCompatActivity() {
     private lateinit var mThisCreateBinding: ActivityThisCreateBinding
     private lateinit var mDatabase: DatabaseReference
     private lateinit var myPreference: mySharedPreference
-    private lateinit var mDataScheduleAdapter: DataScheduleAdapter
     private lateinit var userId: String
-    private lateinit var mSchedule: ArrayList<Schedule>
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,37 +40,41 @@ class ThisCreate : AppCompatActivity() {
         myPreference = mySharedPreference(this@ThisCreate)
         userId = myPreference.getValue(Constants.USER_ID)!!
 
-        mDataScheduleAdapter = DataScheduleAdapter()
 
-        mSchedule = arrayListOf()
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         getDataSchedule()
 
         mThisCreateBinding.btnCreate.setOnClickListener {
-            startActivity(Intent(this, CreateSchedule::class.java))
+            startActivity(
+                Intent(this, CreateSchedule::class.java).putExtra(
+                    Constants.USER_ID,
+                    userId
+                )
+            )
         }
     }
 
     private fun getDataSchedule() {
         mDatabase = FirebaseDatabase.getInstance().getReference("Schedule")
 
-        mDatabase.addValueEventListener(object : ValueEventListener {
+        mDatabase.child(userId).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
+                    val addSchedule = ArrayList<Schedule>()
                     for (item in snapshot.children) {
                         val listSchedule = item.getValue(Schedule::class.java)
-                        mSchedule.add(listSchedule!!)
+                        addSchedule.add(listSchedule!!)
                     }
 
-                    mDataScheduleAdapter.setSchedule(mSchedule)
 
-                    with(mThisCreateBinding.rvList){
+                    with(mThisCreateBinding.rvList) {
                         layoutManager = LinearLayoutManager(this@ThisCreate)
                         setHasFixedSize(true)
-                        adapter = mDataScheduleAdapter
+                        adapter = DataScheduleAdapter(this@ThisCreate, addSchedule)
                     }
 
-                }
-                else{
+                } else {
                     Toast.makeText(this@ThisCreate, "No schedule list", Toast.LENGTH_SHORT).show()
                 }
             }

@@ -42,6 +42,14 @@ class CreateSchedule : AppCompatActivity() {
         mDatabaseReference = FirebaseDatabase.getInstance().getReference("Schedule")
         userId = myPreference.getValue(Constants.USER_ID)!!
 
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+
+        if(intent != null){
+            userId = intent.getStringExtra(Constants.USER_ID)!!
+        }
+
+
         mCreateBinding.btnSave.setOnClickListener {
             if(validate()){
                 val mDate = mCreateBinding.tvValueDate.text.toString()

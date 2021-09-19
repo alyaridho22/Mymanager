@@ -8,5 +8,6 @@ object Constants {
     const val USER_PHONE = "phone"
     const val USER_PASSWORD = "password"
     const val USER_EMAIL = "email"
-
+    const val DATE = "19-09-2021"
+    const val TIME = "12.30"
 }

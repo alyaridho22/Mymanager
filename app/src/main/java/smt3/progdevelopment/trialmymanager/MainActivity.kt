@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import smt3.progdevelopment.trialmymanager.Authentication.SignIn
 import smt3.progdevelopment.trialmymanager.Utils.mySharedPreference
 import smt3.progdevelopment.trialmymanager.Create.ThisCreate
 import smt3.progdevelopment.trialmymanager.Ongoing.OngoingPage
@@ -49,7 +50,7 @@ class MainActivity : AppCompatActivity() {
                 this@MainActivity, ThisCreate::class.java
             )
             startActivity(goCreate)
-            finish()
+//            finish()
         }
 
         mMainBinding.btnOnGoing.setOnClickListener {
@@ -74,6 +75,20 @@ class MainActivity : AppCompatActivity() {
             )
             startActivity(goReport)
 //            finish()
+        }
+
+        mMainBinding.btnLogout.setOnClickListener {
+            myPreferences.setValue(Constants.USER, "")
+
+            myPreferences.setValue(Constants.USER_ID, "")
+            myPreferences.setValue(Constants.USER_NAME, "")
+            myPreferences.setValue(Constants.USER_EMAIL, "")
+            myPreferences.setValue(Constants.USER_PHONE, "")
+            myPreferences.setValue(Constants.USER_PASSWORD, "")
+
+
+            startActivity(Intent(this, SignIn::class.java))
+            finish()
         }
     }
 }
